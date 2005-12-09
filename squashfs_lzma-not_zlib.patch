@@ -1,0 +1,11 @@
+--- squashfs2.2-r2/squashfs-tools/Makefile.orig	2005-12-09 21:12:49.000000000 +0000
++++ squashfs2.2-r2/squashfs-tools/Makefile	2005-12-09 21:13:24.000000000 +0000
+@@ -3,7 +3,7 @@
+ CFLAGS := -I$(INCLUDEDIR) -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -g
+ 
+ mksquashfs: mksquashfs.o read_fs.o sort.o
+-	$(CC) mksquashfs.o read_fs.o sort.o -lz -o $@
++	$(CXX) mksquashfs.o read_fs.o sort.o -llzma -o $@
+ 
+ mksquashfs.o: mksquashfs.c mksquashfs.h
+ 
