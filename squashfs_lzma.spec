@@ -28,8 +28,10 @@ URL:		http://squashfs.sourceforge.net/
 %{?with_dist_kernel:BuildRequires:	kernel-module-build >= 2.6.7}
 BuildRequires:	rpmbuild(macros) >= 1.217
 %endif
+%if %{with userspace}
 BuildRequires:	libstdc++-devel
 BuildRequires:	lzma-devel
+%endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
