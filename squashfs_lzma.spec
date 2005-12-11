@@ -31,6 +31,7 @@ BuildRequires:	rpmbuild(macros) >= 1.217
 %if %{with userspace}
 BuildRequires:	libstdc++-devel
 BuildRequires:	lzma-devel
+BuildRequires:	zlib-devel
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
