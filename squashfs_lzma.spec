@@ -12,7 +12,7 @@
 
 %define	_origname	squashfs
 Summary:	Set of tools which creates squashfs filesystem with lzma compression
-Summary(pl):	Zestaw narzêdzi do tworzenia systemu plików squashfs z kompresja lzma
+Summary(pl):	Zestaw narzêdzi do tworzenia systemu plików squashfs z kompresj± lzma
 Name:		squashfs_lzma
 Version:	2.2
 %define		_rel	0.1
@@ -36,7 +36,8 @@ BuildRequires:	zlib-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
-This package contains utilities for squashfs filesystem.
+This package contains utilities for squashfs filesystem with lzma
+compression.
 
 Squashfs is a highly compressed read-only filesystem for Linux (kernel
 2.4.x and 2.6.x). It uses zlib compression to compress both files,
@@ -50,7 +51,7 @@ constrained block device/memory systems (e.g. embedded systems) where
 low overhead is needed.
 
 %description -l pl
-Zestaw narzêdzi do tworzenia systemu plików squashfs.
+Zestaw narzêdzi do tworzenia systemu plików squashfs z kompresj± lzma.
 
 Squashfs jest systemem plików tylko do odczytu z du¿ym wspó³czynnikiem
 kompresji dla Linuksa (j±dra 2.4.x i 2.6.x). U¿ywa kompresji zlib do
@@ -141,9 +142,7 @@ for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 %endif
 	ln -sf %{_kernelsrcdir}/Module.symvers-$cfg Module.symvers
 	touch include/config/MARKER
-#
-#	patching/creating makefile(s) (optional)
-#
+
 	%{__make} -C %{_kernelsrcdir} clean \
 		RCS_FIND_IGNORE="-name '*.ko' -o" \
 		M=$PWD O=$PWD \
@@ -190,6 +189,13 @@ rm -rf $RPM_BUILD_ROOT
 %postun	-n kernel-smp-fs-squashfs_lzma
 %depmod %{_kernel_ver}smp
 
+%if %{with userspace}
+%files
+%defattr(644,root,root,755)
+%doc README ACKNOWLEDGEMENTS CHANGES
+%attr(755,root,root) %{_sbindir}/*
+%endif
+
 %if %{with kernel}
 %files -n kernel-fs-squashfs_lzma
 %defattr(644,root,root,755)
@@ -200,11 +206,4 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}smp/kernel/fs/*.ko*
 %endif
-%endif
-
-%if %{with userspace}
-%files
-%defattr(644,root,root,755)
-%doc README ACKNOWLEDGEMENTS CHANGES
-%attr(755,root,root) %{_sbindir}/*
 %endif
