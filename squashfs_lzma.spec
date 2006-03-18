@@ -14,15 +14,16 @@
 Summary:	Set of tools which creates squashfs filesystem with lzma compression
 Summary(pl):	Zestaw narzêdzi do tworzenia systemu plików squashfs z kompresj± lzma
 Name:		squashfs_lzma
-Version:	2.2
+Version:	3.0
 %define		_rel	0.1
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Utilities
-Source0:	http://dl.sourceforge.net/squashfs/%{_origname}%{version}-r2.tar.gz
-# Source0-md5:	a8d09a217240127ae4d339e8368d2de1
+Source0:	http://dl.sourceforge.net/squashfs/%{_origname}%{version}.tar.gz
+# Source0-md5:	9fd05d0bfbb712f5fb95edafea5bc733
 Patch0:		%{name}-module.patch
 Patch1:		%{name}-not_zlib.patch
+Patch2:		%{name}-magic.patch
 URL:		http://squashfs.sourceforge.net/
 %if %{with kernel}
 %{?with_dist_kernel:BuildRequires:	kernel-module-build >= 2.6.7}
@@ -107,9 +108,10 @@ Sterownik dla Linuksa do squashfs skompresowanego lzma.
 Ten pakiet zawiera modu³ j±dra Linuksa SMP.
 
 %prep
-%setup -q -n %{_origname}%{version}-r2
+%setup -q -n %{_origname}%{version}
 %patch0 -p0
 %patch1 -p1
+%patch2 -p1
 
 %build
 %if %{with userspace}
@@ -161,6 +163,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %if %{with userspace}
 install -D squashfs-tools/mksquashfs $RPM_BUILD_ROOT%{_sbindir}/mksquashfs_lzma
+install squashfs-tools/unsquashfs $RPM_BUILD_ROOT%{_sbindir}/unsquashfs_lzma
 %endif
 
 %if %{with kernel}
