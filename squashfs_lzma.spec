@@ -15,7 +15,7 @@ Summary:	Set of tools which creates squashfs filesystem with lzma compression
 Summary(pl):	Zestaw narzêdzi do tworzenia systemu plików squashfs z kompresj± lzma
 Name:		squashfs_lzma
 Version:	3.0
-%define		_rel	0.1
+%define		_rel	1
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Utilities
