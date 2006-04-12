@@ -11,11 +11,11 @@
 %endif
 
 %define	_origname	squashfs
+%define		_rel	1
 Summary:	Set of tools which creates squashfs filesystem with lzma compression
 Summary(pl):	Zestaw narzêdzi do tworzenia systemu plików squashfs z kompresj± lzma
 Name:		squashfs_lzma
 Version:	3.0
-%define		_rel	1
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Utilities
@@ -26,7 +26,7 @@ Patch1:		%{name}-not_zlib.patch
 Patch2:		%{name}-magic.patch
 URL:		http://squashfs.sourceforge.net/
 %if %{with kernel}
-%{?with_dist_kernel:BuildRequires:	kernel-module-build >= 2.6.7}
+%{?with_dist_kernel:BuildRequires:	kernel-module-build >= 3:2.6.7}
 BuildRequires:	rpmbuild(macros) >= 1.217
 %endif
 %if %{with userspace}
