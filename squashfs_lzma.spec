@@ -26,8 +26,8 @@ Patch1:		%{name}-not_zlib.patch
 Patch2:		%{name}-magic.patch
 URL:		http://squashfs.sourceforge.net/
 %if %{with kernel}
-%{?with_dist_kernel:BuildRequires:	kernel-module-build >= 3:2.6.7}
-BuildRequires:	rpmbuild(macros) >= 1.217
+%{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.7}
+BuildRequires:	rpmbuild(macros) >= 1.308
 %endif
 %if %{with userspace}
 BuildRequires:	libstdc++-devel
@@ -65,7 +65,7 @@ przeznaczenia, do sk³adowania archiwów (w tych przypadkach, kiedy
 mo¿na u¿ywaæ plików .tar.gz) oraz w systemach z du¿ymi ograniczeniami
 pamiêci i urz±dzeñ blokowych (np. systemach wbudowanych).
 
-%package -n kernel-fs-squashfs_lzma
+%package -n kernel%{_alt_kernel}-fs-squashfs_lzma
 Summary:	Linux driver for lzma-compressed squashfs
 Summary(pl):	Sterownik dla Linuksa do squashfs skompresowanego lzma
 Release:	%{_rel}@%{_kernel_ver_str}
@@ -76,17 +76,17 @@ Requires(post,postun):	/sbin/depmod
 Requires(postun):	%releq_kernel_up
 %endif
 
-%description -n kernel-fs-squashfs_lzma
+%description -n kernel%{_alt_kernel}-fs-squashfs_lzma
 This is driver for lzma-compressed squashfs for Linux.
 
 This package contains Linux module.
 
-%description -n kernel-fs-squashfs_lzma -l pl
+%description -n kernel%{_alt_kernel}-fs-squashfs_lzma -l pl
 Sterownik dla Linuksa do squashfs skompresowanego lzma.
 
 Ten pakiet zawiera modu³ j±dra Linuksa.
 
-%package -n kernel-smp-fs-squashfs_lzma
+%package -n kernel%{_alt_kernel}-smp-fs-squashfs_lzma
 Summary:	Linux SMP driver for MODULE_NAME
 Summary(pl):	Sterownik dla Linuksa SMP do MODULE_NAME
 Release:	%{_rel}@%{_kernel_ver_str}
@@ -97,12 +97,12 @@ Requires(post,postun):	/sbin/depmod
 Requires(postun):	%releq_kernel_smp
 %endif
 
-%description -n kernel-smp-fs-squashfs_lzma
+%description -n kernel%{_alt_kernel}-smp-fs-squashfs_lzma
 This is driver for lzma-compressed squashfs for Linux.
 
 This package contains Linux SMP module.
 
-%description -n kernel-smp-fs-squashfs_lzma -l pl
+%description -n kernel%{_alt_kernel}-smp-fs-squashfs_lzma -l pl
 Sterownik dla Linuksa do squashfs skompresowanego lzma.
 
 Ten pakiet zawiera modu³ j±dra Linuksa SMP.
@@ -179,16 +179,16 @@ install squashfs/squashfs_lzma-smp.ko \
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post	-n kernel-fs-squashfs_lzma
+%post	-n kernel%{_alt_kernel}-fs-squashfs_lzma
 %depmod %{_kernel_ver}
 
-%postun	-n kernel-fs-squashfs_lzma
+%postun	-n kernel%{_alt_kernel}-fs-squashfs_lzma
 %depmod %{_kernel_ver}
 
-%post	-n kernel-smp-fs-squashfs_lzma
+%post	-n kernel%{_alt_kernel}-smp-fs-squashfs_lzma
 %depmod %{_kernel_ver}smp
 
-%postun	-n kernel-smp-fs-squashfs_lzma
+%postun	-n kernel%{_alt_kernel}-smp-fs-squashfs_lzma
 %depmod %{_kernel_ver}smp
 
 %if %{with userspace}
@@ -199,12 +199,12 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %if %{with kernel}
-%files -n kernel-fs-squashfs_lzma
+%files -n kernel%{_alt_kernel}-fs-squashfs_lzma
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}/kernel/fs/*.ko*
 
 %if %{with smp} && %{with dist_kernel}
-%files -n kernel-smp-fs-squashfs_lzma
+%files -n kernel%{_alt_kernel}-smp-fs-squashfs_lzma
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}smp/kernel/fs/*.ko*
 %endif
