@@ -27,7 +27,7 @@ Patch2:		%{name}-magic.patch
 URL:		http://squashfs.sourceforge.net/
 %if %{with kernel}
 %{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.7}
-BuildRequires:	rpmbuild(macros) >= 1.308
+BuildRequires:	rpmbuild(macros) >= 1.329
 %endif
 %if %{with userspace}
 BuildRequires:	libstdc++-devel
@@ -122,40 +122,7 @@ Ten pakiet zawiera modu³ j±dra Linuksa SMP.
 %endif
 
 %if %{with kernel}
-cd squashfs
-# kernel module(s)
-for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}; do
-	if [ ! -r "%{_kernelsrcdir}/config-$cfg" ]; then
-		exit 1
-	fi
-	install -d o/include/linux
-	ln -sf %{_kernelsrcdir}/config-$cfg o/.config
-	ln -sf %{_kernelsrcdir}/Module.symvers-$cfg o/Module.symvers
-	ln -sf %{_kernelsrcdir}/include/linux/autoconf-$cfg.h o/include/linux/autoconf.h
-%if %{with dist_kernel}
-	%{__make} -j1 -C %{_kernelsrcdir} O=$PWD/o prepare scripts
-%else
-	install -d o/include/config
-	touch o/include/config/MARKER
-	ln -sf %{_kernelsrcdir}/scripts o/scripts
-%endif
-
-	%{__make} -C %{_kernelsrcdir} clean \
-		RCS_FIND_IGNORE="-name '*.ko' -o" \
-		SYSSRC=%{_kernelsrcdir} \
-		SYSOUT=$PWD/o \
-		M=$PWD O=$PWD/o \
-		%{?with_verbose:V=1}
-	%{__make} -C %{_kernelsrcdir} modules \
-		CC="%{__cc}" CPP="%{__cpp}" \
-		SYSSRC=%{_kernelsrcdir} \
-		SYSOUT=$PWD/o \
-		M=$PWD O=$PWD/o \
-		%{?with_verbose:V=1}
-
-	mv squashfs_lzma{,-$cfg}.ko
-done
-cd ..
+%build_kernel_modules -C squashfs -m squashfs_lzma
 %endif
 
 %install
@@ -167,13 +134,7 @@ install squashfs-tools/unsquashfs $RPM_BUILD_ROOT%{_sbindir}/unsquashfs_lzma
 %endif
 
 %if %{with kernel}
-install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}{,smp}/kernel/fs
-install squashfs/squashfs_lzma-%{?with_dist_kernel:up}%{!?with_dist_kernel:nondist}.ko \
-	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/fs/squashfs_lzma.ko
-%if %{with smp} && %{with dist_kernel}
-install squashfs/squashfs_lzma-smp.ko \
-	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/kernel/fs/squashfs_lzma.ko
-%endif
+%install_kernel_modules -m squashfs/squashfs_lzma -d kernel/fs
 %endif
 
 %clean
@@ -201,11 +162,11 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with kernel}
 %files -n kernel%{_alt_kernel}-fs-squashfs_lzma
 %defattr(644,root,root,755)
-/lib/modules/%{_kernel_ver}/kernel/fs/*.ko*
+/lib/modules/%{_kernel_ver}/kernel/fs/squashfs_lzma.ko*
 
 %if %{with smp} && %{with dist_kernel}
 %files -n kernel%{_alt_kernel}-smp-fs-squashfs_lzma
 %defattr(644,root,root,755)
-/lib/modules/%{_kernel_ver}smp/kernel/fs/*.ko*
+/lib/modules/%{_kernel_ver}smp/kernel/fs/squashfs_lzma.ko*
 %endif
 %endif
