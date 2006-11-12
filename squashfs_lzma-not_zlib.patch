@@ -1,5 +1,6 @@
---- squashfs3.0/squashfs-tools/Makefile.orig	2006-03-15 22:36:20.000000000 +0100
-+++ squashfs3.0/squashfs-tools/Makefile	2006-03-18 21:41:26.000000000 +0100
+diff -Nur squashfs3.0.orig/squashfs-tools/Makefile squashfs3.0.not_zlib/squashfs-tools/Makefile
+--- squashfs3.0.orig/squashfs-tools/Makefile	2006-03-15 21:36:20.000000000 +0000
++++ squashfs3.0.not_zlib/squashfs-tools/Makefile	2006-11-12 22:12:28.000000000 +0000
 @@ -5,7 +5,7 @@
  all: mksquashfs unsquashfs
  
@@ -17,3 +18,129 @@
 +	$(CXX) unsquashfs.o -llzma -o $@
  
  unsquashfs.o: unsquashfs.c squashfs_fs.h read_fs.h global.h
+diff -Nur squashfs3.0.orig/squashfs-tools/mksquashfs.c squashfs3.0.not_zlib/squashfs-tools/mksquashfs.c
+--- squashfs3.0.orig/squashfs-tools/mksquashfs.c	2006-03-15 21:36:20.000000000 +0000
++++ squashfs3.0.not_zlib/squashfs-tools/mksquashfs.c	2006-11-12 22:17:31.000000000 +0000
+@@ -35,7 +35,7 @@
+ #include <errno.h>
+ #include <dirent.h>
+ #include <string.h>
+-#include <zlib.h>
++#include <lzmalib.h>
+ #include <stdlib.h>
+ #include <signal.h>
+ #include <setjmp.h>
+@@ -308,13 +308,13 @@
+ 	unsigned long c_byte = block_size << 1;
+ 	unsigned int res;
+ 
+-	if(!uncompressed && (res = compress2((unsigned char *) d, &c_byte, (unsigned char *) s, size, 9)) != Z_OK) {
++	if(!uncompressed && (res = lzma_compress((unsigned char *) d, &c_byte, (unsigned char *) s, size, 9)) != Z_OK) {
+ 		if(res == Z_MEM_ERROR)
+-			BAD_ERROR("zlib::compress failed, not enough memory\n");
++			BAD_ERROR("lzma::compress failed, not enough memory\n");
+ 		else if(res == Z_BUF_ERROR)
+-			BAD_ERROR("zlib::compress failed, not enough room in output buffer\n");
++			BAD_ERROR("lzma::compress failed, not enough room in output buffer\n");
+ 		else
+-			BAD_ERROR("zlib::compress failed, unknown error %d\n", res);
++			BAD_ERROR("lzma::compress failed, unknown error %d\n", res);
+ 		return 0;
+ 	}
+ 
+@@ -901,13 +901,13 @@
+ 
+ 		read_bytes(fd, disk_fragment->start_block, size, cbuffer);
+ 
+-		if((res = uncompress((unsigned char *) buffer, &bytes, (const unsigned char *) cbuffer, size)) != Z_OK) {
++		if((res = lzma_uncompress((unsigned char *) buffer, &bytes, (const unsigned char *) cbuffer, size)) != Z_OK) {
+ 			if(res == Z_MEM_ERROR)
+-				BAD_ERROR("zlib::uncompress failed, not enough memory\n");
++				BAD_ERROR("lzma::uncompress failed, not enough memory\n");
+ 			else if(res == Z_BUF_ERROR)
+-				BAD_ERROR("zlib::uncompress failed, not enough room in output buffer\n");
++				BAD_ERROR("lzma::uncompress failed, not enough room in output buffer\n");
+ 			else
+-				BAD_ERROR("zlib::uncompress failed, unknown error %d\n", res);
++				BAD_ERROR("lzma::uncompress failed, unknown error %d\n", res);
+ 		}
+ 	} else
+ 		read_bytes(fd, disk_fragment->start_block, size, buffer);
+diff -Nur squashfs3.0.orig/squashfs-tools/read_fs.c squashfs3.0.not_zlib/squashfs-tools/read_fs.c
+--- squashfs3.0.orig/squashfs-tools/read_fs.c	2006-03-15 21:36:21.000000000 +0000
++++ squashfs3.0.not_zlib/squashfs-tools/read_fs.c	2006-11-12 22:15:07.000000000 +0000
+@@ -32,7 +32,7 @@
+ #include <fcntl.h>
+ #include <errno.h>
+ #include <string.h>
+-#include <zlib.h>
++#include <lzmalib.h>
+ #include <sys/mman.h>
+ 
+ #ifndef linux
+@@ -85,13 +85,13 @@
+ 		c_byte = SQUASHFS_COMPRESSED_SIZE(c_byte);
+ 		read_bytes(fd, start + offset, c_byte, buffer);
+ 
+-		if((res = uncompress(block, &bytes, (const unsigned char *) buffer, c_byte)) != Z_OK) {
++		if((res = lzma_uncompress(block, &bytes, (const unsigned char *) buffer, c_byte)) != Z_OK) {
+ 			if(res == Z_MEM_ERROR)
+-				ERROR("zlib::uncompress failed, not enough memory\n");
++				ERROR("lzma::uncompress failed, not enough memory\n");
+ 			else if(res == Z_BUF_ERROR)
+-				ERROR("zlib::uncompress failed, not enough room in output buffer\n");
++				ERROR("lzma::uncompress failed, not enough room in output buffer\n");
+ 			else
+-				ERROR("zlib::uncompress failed, unknown error %d\n", res);
++				ERROR("lzma::uncompress failed, unknown error %d\n", res);
+ 			return 0;
+ 		}
+ 		if(next)
+diff -Nur squashfs3.0.orig/squashfs-tools/unsquashfs.c squashfs3.0.not_zlib/squashfs-tools/unsquashfs.c
+--- squashfs3.0.orig/squashfs-tools/unsquashfs.c	2006-03-15 21:36:21.000000000 +0000
++++ squashfs3.0.not_zlib/squashfs-tools/unsquashfs.c	2006-11-12 22:16:08.000000000 +0000
+@@ -29,7 +29,7 @@
+ #include <fcntl.h>
+ #include <errno.h>
+ #include <string.h>
+-#include <zlib.h>
++#include <lzmalib.h>
+ #include <sys/mman.h>
+ #include <utime.h>
+ 
+@@ -164,13 +164,13 @@
+ 		if(read_bytes(start + offset, c_byte, buffer) == FALSE)
+ 			goto failed;
+ 
+-		if((res = uncompress((unsigned char *) block, &bytes, (const unsigned char *) buffer, c_byte)) != Z_OK) {
++		if((res = lzma_uncompress((unsigned char *) block, &bytes, (const unsigned char *) buffer, c_byte)) != Z_OK) {
+ 			if(res == Z_MEM_ERROR)
+-				ERROR("zlib::uncompress failed, not enough memory\n");
++				ERROR("lzma::uncompress failed, not enough memory\n");
+ 			else if(res == Z_BUF_ERROR)
+-				ERROR("zlib::uncompress failed, not enough room in output buffer\n");
++				ERROR("lzma::uncompress failed, not enough room in output buffer\n");
+ 			else
+-				ERROR("zlib::uncompress failed, unknown error %d\n", res);
++				ERROR("lzma::uncompress failed, unknown error %d\n", res);
+ 			goto failed;
+ 		}
+ 		if(next)
+@@ -202,13 +202,13 @@
+ 		if(read_bytes(start, c_byte, data) == FALSE)
+ 			return 0;
+ 
+-		if((res = uncompress((unsigned char *) block, &bytes, (const unsigned char *) data, c_byte)) != Z_OK) {
++		if((res = lzma_uncompress((unsigned char *) block, &bytes, (const unsigned char *) data, c_byte)) != Z_OK) {
+ 			if(res == Z_MEM_ERROR)
+-				ERROR("zlib::uncompress failed, not enough memory\n");
++				ERROR("lzma::uncompress failed, not enough memory\n");
+ 			else if(res == Z_BUF_ERROR)
+-				ERROR("zlib::uncompress failed, not enough room in output buffer\n");
++				ERROR("lzma::uncompress failed, not enough room in output buffer\n");
+ 			else
+-				ERROR("zlib::uncompress failed, unknown error %d\n", res);
++				ERROR("lzma::uncompress failed, unknown error %d\n", res);
+ 			return 0;
+ 		}
+ 
