@@ -1,4 +1,7 @@
 #
+# NOTE: squashfs 3.1 uses some zlib functions which don't exist in lzma,
+#	that's why it probably won't be updated
+#
 # Conditional build:
 %bcond_without	dist_kernel	# allow non-distribution kernel
 %bcond_without	kernel		# don't build kernel modules
@@ -6,7 +9,7 @@
 %bcond_without	userspace	# don't build userspace programs
 %bcond_with	verbose		# verbose build (V=1)
 
-%if %{without kernel}
+%if !%{with kernel}
 %undefine	with_dist_kernel
 %endif
 
@@ -40,10 +43,10 @@ This package contains utilities for squashfs filesystem with lzma
 compression.
 
 Squashfs is a highly compressed read-only filesystem for Linux (kernel
-2.4.x and 2.6.x). It uses zlib compression to compress both files,
-inodes and directories. Inodes in the system are very small and all
-blocks are packed to minimise data overhead. Block sizes greater than
-4K are supported up to a maximum of 64K.
+2.4.x and 2.6.x). It uses lzma compression to compress files, inodes
+and directories. Inodes in the system are very small and all blocks
+are packed to minimise data overhead. Block sizes greater than 4K are
+supported up to a maximum of 64K.
 
 Squashfs is intended for general read-only filesystem use, for
 archival use (i.e. in cases where a .tar.gz file may be used), and in
@@ -54,7 +57,7 @@ low overhead is needed.
 Zestaw narzêdzi do tworzenia systemu plików squashfs z kompresj± lzma.
 
 Squashfs jest systemem plików tylko do odczytu z du¿ym wspó³czynnikiem
-kompresji dla Linuksa (j±dra 2.4.x i 2.6.x). U¿ywa kompresji zlib do
+kompresji dla Linuksa (j±dra 2.4.x i 2.6.x). U¿ywa kompresji lzma do
 plików, i-wêz³ów oraz katalogów. I-wêz³y s± bardzo ma³e, a wszystkie
 bloki s± pakowane, aby zmniejszyæ objêto¶æ. Rozmiary bloków powy¿ej
 4kB s± obs³ugiwane - maksymalnie do 64kB.
@@ -128,7 +131,8 @@ Ten pakiet zawiera modu³ j±dra Linuksa SMP.
 rm -rf $RPM_BUILD_ROOT
 
 %if %{with userspace}
-install -D squashfs-tools/mksquashfs $RPM_BUILD_ROOT%{_sbindir}/mksquashfs_lzma
+install -d $RPM_BUILD_ROOT%{_sbindir}
+install squashfs-tools/mksquashfs $RPM_BUILD_ROOT%{_sbindir}/mksquashfs_lzma
 install squashfs-tools/unsquashfs $RPM_BUILD_ROOT%{_sbindir}/unsquashfs_lzma
 %endif
 
