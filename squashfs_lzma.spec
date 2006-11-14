@@ -30,7 +30,7 @@ Patch2:		%{name}-magic.patch
 URL:		http://squashfs.sourceforge.net/
 %if %{with kernel}
 %{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.7}
-BuildRequires:	rpmbuild(macros) >= 1.329
+BuildRequires:	rpmbuild(macros) >= 1.330
 %endif
 %if %{with userspace}
 BuildRequires:	libstdc++-devel
