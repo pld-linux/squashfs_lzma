@@ -16,7 +16,7 @@
 %define	_origname	squashfs
 %define		_rel	1
 Summary:	Set of tools which creates squashfs filesystem with lzma compression
-Summary(pl):	Zestaw narzêdzi do tworzenia systemu plików squashfs z kompresj± lzma
+Summary(pl.UTF-8):   Zestaw narzÄ™dzi do tworzenia systemu plikÃ³w squashfs z kompresjÄ… lzma
 Name:		squashfs_lzma
 Version:	3.0
 Release:	%{_rel}
@@ -53,23 +53,23 @@ archival use (i.e. in cases where a .tar.gz file may be used), and in
 constrained block device/memory systems (e.g. embedded systems) where
 low overhead is needed.
 
-%description -l pl
-Zestaw narzêdzi do tworzenia systemu plików squashfs z kompresj± lzma.
+%description -l pl.UTF-8
+Zestaw narzÄ™dzi do tworzenia systemu plikÃ³w squashfs z kompresjÄ… lzma.
 
-Squashfs jest systemem plików tylko do odczytu z du¿ym wspó³czynnikiem
-kompresji dla Linuksa (j±dra 2.4.x i 2.6.x). U¿ywa kompresji lzma do
-plików, i-wêz³ów oraz katalogów. I-wêz³y s± bardzo ma³e, a wszystkie
-bloki s± pakowane, aby zmniejszyæ objêto¶æ. Rozmiary bloków powy¿ej
-4kB s± obs³ugiwane - maksymalnie do 64kB.
+Squashfs jest systemem plikÃ³w tylko do odczytu z duÅ¼ym wspÃ³Å‚czynnikiem
+kompresji dla Linuksa (jÄ…dra 2.4.x i 2.6.x). UÅ¼ywa kompresji lzma do
+plikÃ³w, i-wÄ™zÅ‚Ã³w oraz katalogÃ³w. I-wÄ™zÅ‚y sÄ… bardzo maÅ‚e, a wszystkie
+bloki sÄ… pakowane, aby zmniejszyÄ‡ objÄ™toÅ›Ä‡. Rozmiary blokÃ³w powyÅ¼ej
+4kB sÄ… obsÅ‚ugiwane - maksymalnie do 64kB.
 
-Squashfs ma s³u¿yæ jako system plików tylko do odczytu ogólnego
-przeznaczenia, do sk³adowania archiwów (w tych przypadkach, kiedy
-mo¿na u¿ywaæ plików .tar.gz) oraz w systemach z du¿ymi ograniczeniami
-pamiêci i urz±dzeñ blokowych (np. systemach wbudowanych).
+Squashfs ma sÅ‚uÅ¼yÄ‡ jako system plikÃ³w tylko do odczytu ogÃ³lnego
+przeznaczenia, do skÅ‚adowania archiwÃ³w (w tych przypadkach, kiedy
+moÅ¼na uÅ¼ywaÄ‡ plikÃ³w .tar.gz) oraz w systemach z duÅ¼ymi ograniczeniami
+pamiÄ™ci i urzÄ…dzeÅ„ blokowych (np. systemach wbudowanych).
 
 %package -n kernel%{_alt_kernel}-fs-squashfs_lzma
 Summary:	Linux driver for lzma-compressed squashfs
-Summary(pl):	Sterownik dla Linuksa do squashfs skompresowanego lzma
+Summary(pl.UTF-8):   Sterownik dla Linuksa do squashfs skompresowanego lzma
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
@@ -83,14 +83,14 @@ This is driver for lzma-compressed squashfs for Linux.
 
 This package contains Linux module.
 
-%description -n kernel%{_alt_kernel}-fs-squashfs_lzma -l pl
+%description -n kernel%{_alt_kernel}-fs-squashfs_lzma -l pl.UTF-8
 Sterownik dla Linuksa do squashfs skompresowanego lzma.
 
-Ten pakiet zawiera modu³ j±dra Linuksa.
+Ten pakiet zawiera moduÅ‚ jÄ…dra Linuksa.
 
 %package -n kernel%{_alt_kernel}-smp-fs-squashfs_lzma
 Summary:	Linux SMP driver for MODULE_NAME
-Summary(pl):	Sterownik dla Linuksa SMP do MODULE_NAME
+Summary(pl.UTF-8):   Sterownik dla Linuksa SMP do MODULE_NAME
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
@@ -104,10 +104,10 @@ This is driver for lzma-compressed squashfs for Linux.
 
 This package contains Linux SMP module.
 
-%description -n kernel%{_alt_kernel}-smp-fs-squashfs_lzma -l pl
+%description -n kernel%{_alt_kernel}-smp-fs-squashfs_lzma -l pl.UTF-8
 Sterownik dla Linuksa do squashfs skompresowanego lzma.
 
-Ten pakiet zawiera modu³ j±dra Linuksa SMP.
+Ten pakiet zawiera moduÅ‚ jÄ…dra Linuksa SMP.
 
 %prep
 %setup -q -n %{_origname}%{version}
