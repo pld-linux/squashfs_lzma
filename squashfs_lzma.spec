@@ -16,7 +16,7 @@
 %define	_origname	squashfs
 %define		_rel	1
 Summary:	Set of tools which creates squashfs filesystem with lzma compression
-Summary(pl.UTF-8):   Zestaw narzędzi do tworzenia systemu plików squashfs z kompresją lzma
+Summary(pl.UTF-8):	Zestaw narzędzi do tworzenia systemu plików squashfs z kompresją lzma
 Name:		squashfs_lzma
 Version:	3.0
 Release:	%{_rel}
@@ -69,7 +69,7 @@ pamięci i urządzeń blokowych (np. systemach wbudowanych).
 
 %package -n kernel%{_alt_kernel}-fs-squashfs_lzma
 Summary:	Linux driver for lzma-compressed squashfs
-Summary(pl.UTF-8):   Sterownik dla Linuksa do squashfs skompresowanego lzma
+Summary(pl.UTF-8):	Sterownik dla Linuksa do squashfs skompresowanego lzma
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
@@ -90,7 +90,7 @@ Ten pakiet zawiera moduł jądra Linuksa.
 
 %package -n kernel%{_alt_kernel}-smp-fs-squashfs_lzma
 Summary:	Linux SMP driver for MODULE_NAME
-Summary(pl.UTF-8):   Sterownik dla Linuksa SMP do MODULE_NAME
+Summary(pl.UTF-8):	Sterownik dla Linuksa SMP do MODULE_NAME
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
