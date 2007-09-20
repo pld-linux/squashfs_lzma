@@ -1,7 +1,4 @@
 #
-# NOTE: squashfs 3.1 uses some zlib functions which don't exist in lzma,
-#	that's why it probably won't be updated
-#
 # Conditional build:
 %bcond_without	dist_kernel	# allow non-distribution kernel
 %bcond_without	kernel		# don't build kernel modules
@@ -38,7 +35,7 @@ BuildRequires:	rpmbuild(macros) >= 1.379
 %endif
 %if %{with userspace}
 BuildRequires:	libstdc++-devel
-BuildRequires:	lzma-devel >= 4.43-5
+#BuildRequires:	lzma-devel >= 4.43-5
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
