@@ -131,6 +131,7 @@ topdir=$(pwd)
 
 %if %{with kernel}
 %build_kernel_modules -C fs/squashfs -m squashfs
+mv fs/squashfs/squashfs{,_lzma}-dist.ko
 %endif
 
 %install
@@ -143,7 +144,7 @@ install squashfs-tools/unsquashfs $RPM_BUILD_ROOT%{_sbindir}/unsquashfs_lzma
 %endif
 
 %if %{with kernel}
-%install_kernel_modules -m fs/squashfs/squashfs -s lzma -d kernel/fs
+%install_kernel_modules -m fs/squashfs/squashfs_lzma -d kernel/fs
 %endif
 
 %clean
@@ -165,5 +166,5 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with kernel}
 %files -n kernel%{_alt_kernel}-fs-squashfs_lzma
 %defattr(644,root,root,755)
-/lib/modules/%{_kernel_ver}/kernel/fs/squashfs-lzma.ko*
+/lib/modules/%{_kernel_ver}/kernel/fs/squashfs_lzma.ko*
 %endif
