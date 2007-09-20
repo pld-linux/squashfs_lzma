@@ -35,6 +35,7 @@ BuildRequires:	rpmbuild(macros) >= 1.379
 %if %{with userspace}
 BuildRequires:	libstdc++-devel
 #BuildRequires:	lzma-devel >= 4.43-5
+BuildRequires:	patchutils
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -93,6 +94,10 @@ Ten pakiet zawiera moduł jądra Linuksa.
 %{__patch} -p1 < sqlzma1-443.patch
 %{__patch} -p1 < sqlzma2u-3.2-r2.patch
 
+# in this patch all are new files except init/do_mounts_rd.c:
+filterdiff -i '*/fs/squashfs/*' -i '*/include/linux/*' < kernel-patches/linux-2.6.20/squashfs3.2-patch | %{__patch} -p1
+%{__patch} -p1 < sqlzma2k-3.2-r2.patch
+
 #%patch0 -p0
 #%patch1 -p1
 #%patch2 -p1
@@ -123,7 +128,7 @@ topdir=$(pwd)
 %endif
 
 %if %{with kernel}
-%build_kernel_modules -C squashfs -m squashfs_lzma
+%build_kernel_modules -C fs/squashfs -m squashfs
 %endif
 
 %install
@@ -136,7 +141,7 @@ install squashfs-tools/unsquashfs $RPM_BUILD_ROOT%{_sbindir}/unsquashfs_lzma
 %endif
 
 %if %{with kernel}
-%install_kernel_modules -m squashfs/squashfs_lzma -d kernel/fs
+%install_kernel_modules -m fs/squashfs -d kernel/fs
 %endif
 
 %clean
