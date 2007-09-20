@@ -97,6 +97,8 @@ Ten pakiet zawiera moduł jądra Linuksa.
 # in this patch all are new files except init/do_mounts_rd.c:
 filterdiff -i '*/fs/squashfs/*' -i '*/include/linux/*' < kernel-patches/linux-2.6.20/squashfs3.2-patch | %{__patch} -p1
 %{__patch} -p1 < sqlzma2k-3.2-r2.patch
+ln -s ../../sqlzma.h fs/squashfs
+ln -s ../../sqmagic.h fs/squashfs
 
 #%patch0 -p0
 #%patch1 -p1
@@ -141,7 +143,7 @@ install squashfs-tools/unsquashfs $RPM_BUILD_ROOT%{_sbindir}/unsquashfs_lzma
 %endif
 
 %if %{with kernel}
-%install_kernel_modules -m fs/squashfs -d kernel/fs
+%install_kernel_modules -m fs/squashfs/squashfs -s lzma -d kernel/fs
 %endif
 
 %clean
@@ -163,5 +165,5 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with kernel}
 %files -n kernel%{_alt_kernel}-fs-squashfs_lzma
 %defattr(644,root,root,755)
-/lib/modules/%{_kernel_ver}/kernel/fs/squashfs_lzma.ko*
+/lib/modules/%{_kernel_ver}/kernel/fs/squashfs-lzma.ko*
 %endif
