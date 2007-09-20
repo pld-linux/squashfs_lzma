@@ -9,28 +9,32 @@
 %bcond_without	userspace	# don't build userspace programs
 %bcond_with	verbose		# verbose build (V=1)
 
-%if !%{with kernel}
+%if %{without kernel}
 %undefine	with_dist_kernel
 %endif
 
-%define	_origname	squashfs
-%define		_rel	1
+%define		_origname	squashfs
+%define		_rel	0.1
 Summary:	Set of tools which creates squashfs filesystem with lzma compression
 Summary(pl.UTF-8):	Zestaw narzędzi do tworzenia systemu plików squashfs z kompresją lzma
 Name:		squashfs_lzma
-Version:	3.0
+Version:	3.2
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Utilities
-Source0:	http://dl.sourceforge.net/squashfs/%{_origname}%{version}.tar.gz
-# Source0-md5:	9fd05d0bfbb712f5fb95edafea5bc733
-Patch0:		%{name}-module.patch
-Patch1:		%{name}-not_zlib.patch
-Patch2:		%{name}-magic.patch
-URL:		http://squashfs.sourceforge.net/
+Source0:	http://dl.sourceforge.net/squashfs/%{_origname}%{version}-r2.tar.gz
+# Source0-md5:	bf360b92eba9e6d5610196ce2e02fcd1
+Source1:	http://www.squashfs-lzma.org/dl/lzma443.tar.bz2
+# Source1-md5:	c4e1b467184c7cffd4371c74df2baf0f
+Source2:	http://www.squashfs-lzma.org/dl/sqlzma%{version}-r2b.tar.bz2
+# Source2-md5:	919faa3cd631f10b02ea39779d3de363
+#Patch0:		%{name}-module.patch
+#Patch1:		%{name}-not_zlib.patch
+#Patch2:		%{name}-magic.patch
+URL:		http://www.squashfs-lzma.org/
 %if %{with kernel}
-%{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.7}
-BuildRequires:	rpmbuild(macros) >= 1.330
+%{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.20.2}
+BuildRequires:	rpmbuild(macros) >= 1.379
 %endif
 %if %{with userspace}
 BuildRequires:	libstdc++-devel
@@ -74,8 +78,8 @@ Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
 %if %{with dist_kernel}
-%requires_releq_kernel_up
-Requires(postun):	%releq_kernel_up
+%requires_releq_kernel
+Requires(postun):	%releq_kernel
 %endif
 
 %description -n kernel%{_alt_kernel}-fs-squashfs_lzma
@@ -88,39 +92,38 @@ Sterownik dla Linuksa do squashfs skompresowanego lzma.
 
 Ten pakiet zawiera moduł jądra Linuksa.
 
-%package -n kernel%{_alt_kernel}-smp-fs-squashfs_lzma
-Summary:	Linux SMP driver for MODULE_NAME
-Summary(pl.UTF-8):	Sterownik dla Linuksa SMP do MODULE_NAME
-Release:	%{_rel}@%{_kernel_ver_str}
-Group:		Base/Kernel
-Requires(post,postun):	/sbin/depmod
-%if %{with dist_kernel}
-%requires_releq_kernel_smp
-Requires(postun):	%releq_kernel_smp
-%endif
-
-%description -n kernel%{_alt_kernel}-smp-fs-squashfs_lzma
-This is driver for lzma-compressed squashfs for Linux.
-
-This package contains Linux SMP module.
-
-%description -n kernel%{_alt_kernel}-smp-fs-squashfs_lzma -l pl.UTF-8
-Sterownik dla Linuksa do squashfs skompresowanego lzma.
-
-Ten pakiet zawiera moduł jądra Linuksa SMP.
-
 %prep
-%setup -q -n %{_origname}%{version}
-%patch0 -p0
-%patch1 -p1
-%patch2 -p1
+%setup -q -n %{_origname}%{version}-r2 -a1 -a2
+%{__patch} -p1 < sqlzma1-443.patch
+%{__patch} -p1 < sqlzma2u-3.2-r2.patch
+
+#%patch0 -p0
+#%patch1 -p1
+#%patch2 -p1
 
 %build
 %if %{with userspace}
-%{__make} -C squashfs-tools \
+topdir=$(pwd)
+%{__make} -C C/7zip/Compress/LZMA_C -f sqlzma.mk Sqlzma=$topdir \
+	CXX="%{__cxx}" \
+	CXX_C="%{__cc}" \
+	CC="%{__cc}" \
+	OPTFLAGS="%{rpmcflags}" \
+	LDFLAGS="%{rpmcflags} %{rpmldflags}"
+
+%{__make} -C C/7zip/Compress/LZMA_Alone -f sqlzma.mk Sqlzma=$topdir \
+	CXX="%{__cxx}" \
+	CXX_C="%{__cc}" \
+	CC="%{__cc}" \
+	OPTFLAGS="%{rpmcflags}" \
+	LDFLAGS="%{rpmcflags} %{rpmldflags}"
+
+%{__make} -C squashfs-tools Sqlzma=$topdir \
+	LzmaAlone=../C/7zip/Compress/LZMA_Alone \
+	LzmaC=../C/7zip/Compress/LZMA_C \
 	CC="%{__cc}" \
 	CXX="%{__cxx}" \
-	CFLAGS="-I. %{rpmcflags}"
+	DebugFlags="%{rpmcflags}"
 %endif
 
 %if %{with kernel}
@@ -149,12 +152,6 @@ rm -rf $RPM_BUILD_ROOT
 %postun	-n kernel%{_alt_kernel}-fs-squashfs_lzma
 %depmod %{_kernel_ver}
 
-%post	-n kernel%{_alt_kernel}-smp-fs-squashfs_lzma
-%depmod %{_kernel_ver}smp
-
-%postun	-n kernel%{_alt_kernel}-smp-fs-squashfs_lzma
-%depmod %{_kernel_ver}smp
-
 %if %{with userspace}
 %files
 %defattr(644,root,root,755)
@@ -166,10 +163,4 @@ rm -rf $RPM_BUILD_ROOT
 %files -n kernel%{_alt_kernel}-fs-squashfs_lzma
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}/kernel/fs/squashfs_lzma.ko*
-
-%if %{with smp} && %{with dist_kernel}
-%files -n kernel%{_alt_kernel}-smp-fs-squashfs_lzma
-%defattr(644,root,root,755)
-/lib/modules/%{_kernel_ver}smp/kernel/fs/squashfs_lzma.ko*
-%endif
 %endif
