@@ -24,10 +24,11 @@ Source1:	http://www.squashfs-lzma.org/dl/lzma443.tar.bz2
 # Source1-md5:	c4e1b467184c7cffd4371c74df2baf0f
 Source2:	http://www.squashfs-lzma.org/dl/sqlzma%{version}-r2b.tar.bz2
 # Source2-md5:	919faa3cd631f10b02ea39779d3de363
-#Patch0:		%{name}-module.patch
-#Patch1:		%{name}-not_zlib.patch
-#Patch2:		%{name}-magic.patch
+#Patch0:	%{name}-module.patch
+#Patch1:	%{name}-not_zlib.patch
+#Patch2:	%{name}-magic.patch
 URL:		http://www.squashfs-lzma.org/
+BuildRequires:	patchutils
 %if %{with kernel}
 %{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.20.2}
 BuildRequires:	rpmbuild(macros) >= 1.379
@@ -35,7 +36,6 @@ BuildRequires:	rpmbuild(macros) >= 1.379
 %if %{with userspace}
 BuildRequires:	libstdc++-devel
 #BuildRequires:	lzma-devel >= 4.43-5
-BuildRequires:	patchutils
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
