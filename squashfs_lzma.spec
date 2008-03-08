@@ -30,7 +30,7 @@ Patch0:		http://www.squashfs-lzma.org/dl/squashfs-cvsfix.patch
 URL:		http://www.squashfs-lzma.org/
 BuildRequires:	patchutils
 %if %{with kernel}
-%{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.24.3}
+%{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.24}
 BuildRequires:	rpmbuild(macros) >= 1.379
 %endif
 %if %{with userspace}
@@ -103,6 +103,9 @@ ln -s ../../sqmagic.h fs/squashfs
 
 #%patch1 -p1
 #%patch2 -p1
+mv C/Compress/Lzma/kmod/* C/Compress/Lzma
+sed -i 's@../LzmaDecode.c@LzmaDecode.c@' C/Compress/Lzma/module.c
+ln -s ../../../sqlzma.h C/Compress/Lzma
 
 %build
 %if %{with userspace}
@@ -130,7 +133,9 @@ topdir=$(pwd)
 %endif
 
 %if %{with kernel}
-%build_kernel_modules -C fs/squashfs -m squashfs
+%build_kernel_modules -C C/Compress/Lzma -m unlzma,sqlzma
+cp C/Compress/Lzma/Module.symvers fs/squashfs
+%build_kernel_modules -C fs/squashfs -m squashfs -c
 mv fs/squashfs/squashfs{,_lzma}-dist.ko
 %endif
 
@@ -145,6 +150,7 @@ install squashfs-tools/unsquashfs $RPM_BUILD_ROOT%{_sbindir}/unsquashfs_lzma
 
 %if %{with kernel}
 %install_kernel_modules -m fs/squashfs/squashfs_lzma -d kernel/fs
+%install_kernel_modules -m C/Compress/Lzma/{unlzma,sqlzma} -d kernel/fs
 %endif
 
 %clean
@@ -166,5 +172,5 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with kernel}
 %files -n kernel%{_alt_kernel}-fs-squashfs_lzma
 %defattr(644,root,root,755)
-/lib/modules/%{_kernel_ver}/kernel/fs/squashfs_lzma.ko*
+/lib/modules/%{_kernel_ver}/kernel/fs/*lzma.ko*
 %endif
