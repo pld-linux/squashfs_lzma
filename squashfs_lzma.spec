@@ -14,23 +14,23 @@
 Summary:	Set of tools which creates squashfs filesystem with lzma compression
 Summary(pl.UTF-8):	Zestaw narzędzi do tworzenia systemu plików squashfs z kompresją lzma
 Name:		squashfs_lzma
-Version:	3.2
+Version:	3.3
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Utilities
-Source0:	http://dl.sourceforge.net/squashfs/%{_origname}%{version}-r2.tar.gz
-# Source0-md5:	bf360b92eba9e6d5610196ce2e02fcd1
-Source1:	http://www.squashfs-lzma.org/dl/lzma443.tar.bz2
-# Source1-md5:	c4e1b467184c7cffd4371c74df2baf0f
-Source2:	http://www.squashfs-lzma.org/dl/sqlzma%{version}-r2b.tar.bz2
-# Source2-md5:	919faa3cd631f10b02ea39779d3de363
-#Patch0:	%{name}-module.patch
+Source0:	http://www.squashfs-lzma.org/dl/squashfs%{version}.tar.gz
+# Source0-md5:	62d3ff7c067a5aa82f57711b3a4ab86a
+Source1:	http://www.squashfs-lzma.org/dl/lzma457.tar.bz2
+# Source1-md5:	fc7a12a396ade1772e959604d6eb31e1
+Source2:	http://www.squashfs-lzma.org/dl/sqlzma%{version}-457.tar.bz2
+# Source2-md5:	27cc878dca09d955fcc63cb671e55846
+Patch0:		http://www.squashfs-lzma.org/dl/squashfs-cvsfix.patch
 #Patch1:	%{name}-not_zlib.patch
 #Patch2:	%{name}-magic.patch
 URL:		http://www.squashfs-lzma.org/
 BuildRequires:	patchutils
 %if %{with kernel}
-%{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.20.2}
+%{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.24.3}
 BuildRequires:	rpmbuild(macros) >= 1.379
 %endif
 %if %{with userspace}
@@ -90,31 +90,31 @@ Sterownik dla Linuksa do squashfs skompresowanego lzma.
 Ten pakiet zawiera moduł jądra Linuksa.
 
 %prep
-%setup -q -n %{_origname}%{version}-r2 -a1 -a2
-%{__patch} -p1 < sqlzma1-443.patch
-%{__patch} -p1 < sqlzma2u-3.2-r2.patch
+%setup -q -n %{_origname}%{version} -a1 -a2
+%patch0 -p1
+%{__patch} -p1 < sqlzma1-449.patch
+%{__patch} -p1 < sqlzma2u-3.3.patch
 
 # in this patch all are new files except init/do_mounts_rd.c:
-filterdiff -i '*/fs/squashfs/*' -i '*/include/linux/*' < kernel-patches/linux-2.6.20/squashfs3.2-patch | %{__patch} -p1
-%{__patch} -p1 < sqlzma2k-3.2-r2.patch
+filterdiff -i '*/fs/squashfs/*' -i '*/include/linux/*' < kernel-patches/linux-2.6.24/squashfs3.3-patch | %{__patch} -p1
+%{__patch} -p1 < sqlzma2k-3.3.patch
 ln -s ../../sqlzma.h fs/squashfs
 ln -s ../../sqmagic.h fs/squashfs
 
-#%patch0 -p0
 #%patch1 -p1
 #%patch2 -p1
 
 %build
 %if %{with userspace}
 topdir=$(pwd)
-%{__make} -C C/7zip/Compress/LZMA_C -f sqlzma.mk Sqlzma=$topdir \
+%{__make} -C C/Compress/Lzma -f sqlzma.mk Sqlzma=$topdir \
 	CXX="%{__cxx}" \
 	CXX_C="%{__cc}" \
 	CC="%{__cc}" \
 	OPTFLAGS="%{rpmcflags}" \
 	LDFLAGS="%{rpmcflags} %{rpmldflags}"
 
-%{__make} -C C/7zip/Compress/LZMA_Alone -f sqlzma.mk Sqlzma=$topdir \
+%{__make} -C CPP/7zip/Compress/LZMA_Alone -f sqlzma.mk Sqlzma=$topdir \
 	CXX="%{__cxx}" \
 	CXX_C="%{__cc}" \
 	CC="%{__cc}" \
@@ -122,8 +122,8 @@ topdir=$(pwd)
 	LDFLAGS="%{rpmcflags} %{rpmldflags}"
 
 %{__make} -C squashfs-tools Sqlzma=$topdir \
-	LzmaAlone=../C/7zip/Compress/LZMA_Alone \
-	LzmaC=../C/7zip/Compress/LZMA_C \
+	LzmaAlone=../CPP/7zip/Compress/LZMA_Alone \
+	LzmaC=../C/Compress/Lzma \
 	CC="%{__cc}" \
 	CXX="%{__cxx}" \
 	DebugFlags="%{rpmcflags}"
