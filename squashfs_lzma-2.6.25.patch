@@ -1,0 +1,77 @@
+diff -upr squashfs3.3./fs/squashfs/inode.c squashfs3.3../fs/squashfs/inode.c
+--- squashfs3.3./fs/squashfs/inode.c	2008-05-14 21:41:33.550246000 +0200
++++ squashfs3.3../fs/squashfs/inode.c	2008-05-14 22:03:40.959017242 +0200
+@@ -32,6 +32,7 @@
+ #include <linux/vmalloc.h>
+ #include <linux/smp_lock.h>
+ #include <linux/exportfs.h>
++#include <linux/version.h>
+ 
+ #include "squashfs.h"
+ #include "sqlzma.h"
+@@ -59,7 +60,9 @@ static DEFINE_PER_CPU(struct sqlzma *, s
+ 
+ int squashfs_cached_blks;
+ 
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,25))
+ static void vfs_read_inode(struct inode *i);
++#endif
+ static struct dentry *squashfs_get_parent(struct dentry *child);
+ static int squashfs_read_inode(struct inode *i, squashfs_inode_t inode);
+ static int squashfs_statfs(struct dentry *, struct kstatfs *);
+@@ -105,7 +108,9 @@ static struct super_operations squashfs_
+ 	.destroy_inode = squashfs_destroy_inode,
+ 	.statfs = squashfs_statfs,
+ 	.put_super = squashfs_put_super,
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,25))
+ 	.read_inode = vfs_read_inode
++#endif
+ };
+ 
+ static struct export_operations squashfs_export_ops = {
+@@ -665,7 +670,7 @@ out:
+ 	return SQUASHFS_INVALID_BLK;
+ }
+ 	
+-
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,25))
+ static void vfs_read_inode(struct inode *i)
+ {
+ 	struct squashfs_sb_info *msblk = i->i_sb->s_fs_info;
+@@ -676,12 +681,18 @@ static void vfs_read_inode(struct inode 
+ 	if(inode != SQUASHFS_INVALID_BLK)
+ 		(msblk->read_inode)(i, inode);
+ }
+-
++#endif
+ 
+ static struct dentry *squashfs_get_parent(struct dentry *child)
+ {
+ 	struct inode *i = child->d_inode;
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,25))
+ 	struct inode *parent = iget(i->i_sb, SQUASHFS_I(i)->u.s2.parent_inode);
++#else
++	unsigned long ino = SQUASHFS_I(i)->u.s2.parent_inode;
++	squashfs_inode_t inode = squashfs_inode_lookup(i->i_sb, ino);
++	struct inode *parent;
++#endif
+ 	struct dentry *rv;
+ 
+ 	TRACE("Entered squashfs_get_parent\n");
+@@ -707,8 +718,14 @@ SQSH_EXTERN struct inode *squashfs_iget(
+ 	struct inode *i = iget_locked(s, inode_number);
+ 
+ 	TRACE("Entered squashfs_iget\n");
+-
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,25))
+ 	if(i && (i->i_state & I_NEW)) {
++#else
++	if (!i)
++		return ERR_PTR(-ENOMEM);
++
++	if (i->i_state & I_NEW) {
++#endif
+ 		(msblk->read_inode)(i, inode);
+ 		unlock_new_inode(i);
+ 	}
+Tylko w squashfs3.3../fs/squashfs: inode.c~

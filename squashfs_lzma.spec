@@ -27,6 +27,7 @@ Source2:	http://www.squashfs-lzma.org/dl/sqlzma%{version}-457.tar.bz2
 Patch0:		http://www.squashfs-lzma.org/dl/squashfs-cvsfix.patch
 #Patch1:	%{name}-not_zlib.patch
 #Patch2:	%{name}-magic.patch
+Patch3:		squashfs_lzma-2.6.25.patch
 URL:		http://www.squashfs-lzma.org/
 BuildRequires:	patchutils
 %if %{with kernel}
@@ -106,6 +107,7 @@ ln -s ../../sqmagic.h fs/squashfs
 mv C/Compress/Lzma/kmod/* C/Compress/Lzma
 sed -i 's@../LzmaDecode.c@LzmaDecode.c@' C/Compress/Lzma/module.c
 ln -s ../../../sqlzma.h C/Compress/Lzma
+%patch3 -p1
 
 %build
 %if %{with userspace}
