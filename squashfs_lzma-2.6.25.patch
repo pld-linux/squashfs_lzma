@@ -1,6 +1,6 @@
 diff -upr squashfs3.3./fs/squashfs/inode.c squashfs3.3../fs/squashfs/inode.c
 --- squashfs3.3./fs/squashfs/inode.c	2008-05-14 21:41:33.550246000 +0200
-+++ squashfs3.3../fs/squashfs/inode.c	2008-05-14 22:03:40.959017242 +0200
++++ squashfs3.3../fs/squashfs/inode.c	2008-05-15 23:25:22.575809899 +0200
 @@ -32,6 +32,7 @@
  #include <linux/vmalloc.h>
  #include <linux/smp_lock.h>
@@ -38,7 +38,7 @@ diff -upr squashfs3.3./fs/squashfs/inode.c squashfs3.3../fs/squashfs/inode.c
  static void vfs_read_inode(struct inode *i)
  {
  	struct squashfs_sb_info *msblk = i->i_sb->s_fs_info;
-@@ -676,12 +681,18 @@ static void vfs_read_inode(struct inode 
+@@ -676,17 +681,30 @@ static void vfs_read_inode(struct inode 
  	if(inode != SQUASHFS_INVALID_BLK)
  		(msblk->read_inode)(i, inode);
  }
@@ -58,7 +58,20 @@ diff -upr squashfs3.3./fs/squashfs/inode.c squashfs3.3../fs/squashfs/inode.c
  	struct dentry *rv;
  
  	TRACE("Entered squashfs_get_parent\n");
-@@ -707,8 +718,14 @@ SQSH_EXTERN struct inode *squashfs_iget(
+-
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,25))
+ 	if(parent == NULL) {
++#else
++	if (inode == SQUASHFS_INVALID_BLK)
++		return ERR_PTR(-EINVAL);
++
++	parent = squashfs_iget(i->i_sb, inode, ino);
++	if (IS_ERR(parent)) {
++#endif
+ 		rv = ERR_PTR(-EACCES);
+ 		goto out;
+ 	}
+@@ -707,8 +725,14 @@ SQSH_EXTERN struct inode *squashfs_iget(
  	struct inode *i = iget_locked(s, inode_number);
  
  	TRACE("Entered squashfs_iget\n");
