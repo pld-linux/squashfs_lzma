@@ -1,4 +1,7 @@
 #
+# NOTE: 
+# - please don't cleanup this chaos since official 3.4 version will be released
+#
 # Conditional build:
 %bcond_without	dist_kernel	# allow non-distribution kernel
 %bcond_without	kernel		# don't build kernel modules
@@ -9,25 +12,28 @@
 %undefine	with_dist_kernel
 %endif
 
-%define		_origname	squashfs
-%define		_rel	0.1
+%define		origname	squashfs
+%define		rel	0.1
 Summary:	Set of tools which creates squashfs filesystem with lzma compression
 Summary(pl.UTF-8):	Zestaw narzędzi do tworzenia systemu plików squashfs z kompresją lzma
 Name:		squashfs_lzma
-Version:	3.3
-Release:	%{_rel}
+Version:	3.4
+Release:	%{rel}
 License:	GPL
 Group:		Base/Utilities
 Source0:	http://www.squashfs-lzma.org/dl/squashfs%{version}.tar.gz
-# Source0-md5:	62d3ff7c067a5aa82f57711b3a4ab86a
+# Source0-md5:	2a4d2995ad5aa6840c95a95ffa6b1da6
 Source1:	http://www.squashfs-lzma.org/dl/lzma457.tar.bz2
 # Source1-md5:	fc7a12a396ade1772e959604d6eb31e1
-Source2:	http://www.squashfs-lzma.org/dl/sqlzma%{version}-457.tar.bz2
+Source2:	http://www.squashfs-lzma.org/dl/sqlzma3.3-457.tar.bz2
 # Source2-md5:	27cc878dca09d955fcc63cb671e55846
 Patch0:		http://www.squashfs-lzma.org/dl/squashfs-cvsfix.patch
 #Patch1:	%{name}-not_zlib.patch
 #Patch2:	%{name}-magic.patch
 Patch3:		squashfs_lzma-2.6.25.patch
+# extracted from sqlzma3.3-457.tar.bz2 and ported for 3.4 @ 2.6.27
+Patch4:		squashfs_lzma-sqlzma2u-3.3.patch
+Patch5:		squashfs_lzma-sqlzma2k-3.3.patch
 URL:		http://www.squashfs-lzma.org/
 BuildRequires:	patchutils
 %if %{with kernel}
@@ -72,7 +78,7 @@ pamięci i urządzeń blokowych (np. systemach wbudowanych).
 %package -n kernel%{_alt_kernel}-fs-squashfs_lzma
 Summary:	Linux driver for lzma-compressed squashfs
 Summary(pl.UTF-8):	Sterownik dla Linuksa do squashfs skompresowanego lzma
-Release:	%{_rel}@%{_kernel_ver_str}
+Release:	%{rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
 %if %{with dist_kernel}
@@ -91,14 +97,18 @@ Sterownik dla Linuksa do squashfs skompresowanego lzma.
 Ten pakiet zawiera moduł jądra Linuksa.
 
 %prep
-%setup -q -n %{_origname}%{version} -a1 -a2
-%patch0 -p1
+%setup -q -n %{origname}%{version} -a1 -a2
+#patch0 -p1 # cvs fixes included in 3.4 source
+#cp ~/sqlzma2u-3.3.patch .
+#cp ~/sqlzma2k-3.3.patch .
 %{__patch} -p1 < sqlzma1-449.patch
-%{__patch} -p1 < sqlzma2u-3.3.patch
+#{__patch} -p1 < sqlzma2u-3.3.patch
+%patch4 -p1 
 
 # in this patch all are new files except init/do_mounts_rd.c:
-filterdiff -i '*/fs/squashfs/*' -i '*/include/linux/*' < kernel-patches/linux-2.6.24/squashfs3.3-patch | %{__patch} -p1
-%{__patch} -p1 < sqlzma2k-3.3.patch
+filterdiff -i '*/fs/squashfs/*' -i '*/include/linux/*' < kernel-patches/linux-2.6.27-rc4/squashfs3.4-patch | %{__patch} -p1
+#{__patch} -p1 < sqlzma2k-3.3.patch
+%patch5 -p1 
 ln -s ../../sqlzma.h fs/squashfs
 ln -s ../../sqmagic.h fs/squashfs
 
@@ -107,7 +117,7 @@ ln -s ../../sqmagic.h fs/squashfs
 mv C/Compress/Lzma/kmod/* C/Compress/Lzma
 sed -i 's@../LzmaDecode.c@LzmaDecode.c@' C/Compress/Lzma/module.c
 ln -s ../../../sqlzma.h C/Compress/Lzma
-%patch3 -p1
+#patch3 -p1 # obsoleted for 3.4@2.6.27
 
 %build
 %if %{with userspace}
@@ -135,9 +145,9 @@ topdir=$(pwd)
 %endif
 
 %if %{with kernel}
-%build_kernel_modules -C C/Compress/Lzma -m unlzma,sqlzma
+%build_kernel_modules -C C/Compress/Lzma -m unlzma,sqlzma "EXTRA_CFLAGS+=-I$PWD/../../include"
 cp C/Compress/Lzma/Module.symvers fs/squashfs
-%build_kernel_modules -C fs/squashfs -m squashfs -c
+%build_kernel_modules -C fs/squashfs -m squashfs -c "EXTRA_CFLAGS+=-I$PWD/../../include"
 mv fs/squashfs/squashfs{,_lzma}-dist.ko
 %endif
 
@@ -151,8 +161,8 @@ install squashfs-tools/unsquashfs $RPM_BUILD_ROOT%{_sbindir}/unsquashfs_lzma
 %endif
 
 %if %{with kernel}
-%install_kernel_modules -m fs/squashfs/squashfs_lzma -d kernel/fs
-%install_kernel_modules -m C/Compress/Lzma/{unlzma,sqlzma} -d kernel/fs
+%install_kernel_modules -m fs/squashfs/squashfs_lzma -d kernel/fs/squashfs
+%install_kernel_modules -m C/Compress/Lzma/{unlzma,sqlzma} -d kernel/fs/squashfs
 %endif
 
 %clean
@@ -174,5 +184,6 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with kernel}
 %files -n kernel%{_alt_kernel}-fs-squashfs_lzma
 %defattr(644,root,root,755)
-/lib/modules/%{_kernel_ver}/kernel/fs/*lzma.ko*
+# also %dir? it conflicts with standard squashfs
+/lib/modules/%{_kernel_ver}/kernel/fs/squashfs/*lzma.ko*
 %endif
