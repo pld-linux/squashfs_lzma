@@ -1,0 +1,26 @@
+--- squashfs3.4/fs/squashfs/inode.c~	2009-01-04 00:37:01.141407232 +0100
++++ squashfs3.4/fs/squashfs/inode.c	2009-01-04 00:48:17.141340171 +0100
+@@ -32,6 +32,7 @@
+ #include <linux/vmalloc.h>
+ #include <linux/smp_lock.h>
+ #include <linux/exportfs.h>
++#include <linux/version.h>
+ 
+ #include "squashfs.h"
+ #include "sqlzma.h"
+@@ -689,11 +689,15 @@ static struct dentry *squashfs_export_ig
+ 		goto failure;
+ 	}
+ 
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,28))
+ 	dentry = d_alloc_anon(i);
+ 	if (dentry == NULL) {
+ 		iput(i);
+ 		dentry = ERR_PTR(-ENOMEM);
+ 	}
++#else
++	dentry = d_obtain_alias(i);
++#endif
+ 
+ failure:
+ 	return dentry;

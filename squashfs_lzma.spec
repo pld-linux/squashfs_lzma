@@ -34,6 +34,7 @@ Patch3:		squashfs_lzma-2.6.25.patch
 # extracted from sqlzma3.3-457.tar.bz2 and ported for 3.4 @ 2.6.27
 Patch4:		squashfs_lzma-sqlzma2u-3.3.patch
 Patch5:		squashfs_lzma-sqlzma2k-3.3.patch
+Patch6:		squashfs_lzma-2.6.28.patch
 URL:		http://www.squashfs-lzma.org/
 BuildRequires:	patchutils
 %if %{with kernel}
@@ -118,6 +119,7 @@ mv C/Compress/Lzma/kmod/* C/Compress/Lzma
 sed -i 's@../LzmaDecode.c@LzmaDecode.c@' C/Compress/Lzma/module.c
 ln -s ../../../sqlzma.h C/Compress/Lzma
 #patch3 -p1 # obsoleted for 3.4@2.6.27
+%patch6 -p1 
 
 %build
 %if %{with userspace}
