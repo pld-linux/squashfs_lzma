@@ -25,8 +25,8 @@ Source0:	http://www.squashfs-lzma.org/dl/squashfs%{version}.tar.gz
 # Source0-md5:	2a4d2995ad5aa6840c95a95ffa6b1da6
 Source1:	http://www.squashfs-lzma.org/dl/lzma457.tar.bz2
 # Source1-md5:	fc7a12a396ade1772e959604d6eb31e1
-Source2:	http://www.squashfs-lzma.org/dl/sqlzma3.3-457.tar.bz2
-# Source2-md5:	27cc878dca09d955fcc63cb671e55846
+Source2:	ftp://ftp.slax.org/source/slax/sqlzma/sqlzma3.4-457.tar.bz2
+# Source2-md5:	0e7201a040fa9372e9b33f3abdbe19c9
 Patch0:		http://www.squashfs-lzma.org/dl/squashfs-cvsfix.patch
 #Patch1:	%{name}-not_zlib.patch
 #Patch2:	%{name}-magic.patch
@@ -102,7 +102,7 @@ Ten pakiet zawiera moduł jądra Linuksa.
 #patch0 -p1 # cvs fixes included in 3.4 source
 #cp ~/sqlzma2u-3.3.patch .
 #cp ~/sqlzma2k-3.3.patch .
-%{__patch} -p1 < sqlzma1-449.patch
+%{__patch} -p1 < sqlzma1-457.patch
 #{__patch} -p1 < sqlzma2u-3.3.patch
 %patch4 -p1 
 
