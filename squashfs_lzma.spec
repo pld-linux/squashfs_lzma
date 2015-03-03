@@ -13,7 +13,7 @@
 %endif
 
 %define		origname	squashfs
-%define		rel	0.1
+%define		rel	1
 Summary:	Set of tools which creates squashfs filesystem with lzma compression
 Summary(pl.UTF-8):	Zestaw narzędzi do tworzenia systemu plików squashfs z kompresją lzma
 Name:		squashfs_lzma
@@ -35,6 +35,7 @@ Patch3:		squashfs_lzma-2.6.25.patch
 Patch4:		squashfs_lzma-sqlzma2u-3.3.patch
 Patch5:		squashfs_lzma-sqlzma2k-3.3.patch
 Patch6:		squashfs_lzma-2.6.28.patch
+Patch7:		libm.patch
 URL:		http://www.squashfs-lzma.org/
 BuildRequires:	patchutils
 %if %{with kernel}
@@ -104,12 +105,12 @@ Ten pakiet zawiera moduł jądra Linuksa.
 #cp ~/sqlzma2k-3.3.patch .
 %{__patch} -p1 < sqlzma1-457.patch
 #{__patch} -p1 < sqlzma2u-3.3.patch
-%patch4 -p1 
+%patch4 -p1
 
 # in this patch all are new files except init/do_mounts_rd.c:
 filterdiff -i '*/fs/squashfs/*' -i '*/include/linux/*' < kernel-patches/linux-2.6.27-rc4/squashfs3.4-patch | %{__patch} -p1
 #{__patch} -p1 < sqlzma2k-3.3.patch
-%patch5 -p1 
+%patch5 -p1
 ln -s ../../sqlzma.h fs/squashfs
 ln -s ../../sqmagic.h fs/squashfs
 
@@ -119,7 +120,8 @@ mv C/Compress/Lzma/kmod/* C/Compress/Lzma
 sed -i 's@../LzmaDecode.c@LzmaDecode.c@' C/Compress/Lzma/module.c
 ln -s ../../../sqlzma.h C/Compress/Lzma
 #patch3 -p1 # obsoleted for 3.4@2.6.27
-%patch6 -p1 
+%patch6 -p1
+%patch7 -p1
 
 %build
 %if %{with userspace}
@@ -158,8 +160,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %if %{with userspace}
 install -d $RPM_BUILD_ROOT%{_sbindir}
-install squashfs-tools/mksquashfs $RPM_BUILD_ROOT%{_sbindir}/mksquashfs_lzma
-install squashfs-tools/unsquashfs $RPM_BUILD_ROOT%{_sbindir}/unsquashfs_lzma
+install -p squashfs-tools/mksquashfs $RPM_BUILD_ROOT%{_sbindir}/mksquashfs_lzma
+install -p squashfs-tools/unsquashfs $RPM_BUILD_ROOT%{_sbindir}/unsquashfs_lzma
 %endif
 
 %if %{with kernel}
