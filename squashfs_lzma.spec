@@ -105,12 +105,12 @@ Ten pakiet zawiera moduł jądra Linuksa.
 #cp ~/sqlzma2k-3.3.patch .
 %{__patch} -p1 < sqlzma1-457.patch
 #{__patch} -p1 < sqlzma2u-3.3.patch
-%patch4 -p1
+%patch -P4 -p1
 
 # in this patch all are new files except init/do_mounts_rd.c:
 filterdiff -i '*/fs/squashfs/*' -i '*/include/linux/*' < kernel-patches/linux-2.6.27-rc4/squashfs3.4-patch | %{__patch} -p1
 #{__patch} -p1 < sqlzma2k-3.3.patch
-%patch5 -p1
+%patch -P5 -p1
 ln -s ../../sqlzma.h fs/squashfs
 ln -s ../../sqmagic.h fs/squashfs
 
@@ -120,8 +120,8 @@ mv C/Compress/Lzma/kmod/* C/Compress/Lzma
 sed -i 's@../LzmaDecode.c@LzmaDecode.c@' C/Compress/Lzma/module.c
 ln -s ../../../sqlzma.h C/Compress/Lzma
 #patch3 -p1 # obsoleted for 3.4@2.6.27
-%patch6 -p1
-%patch7 -p1
+%patch -P6 -p1
+%patch -P7 -p1
 
 %build
 %if %{with userspace}
