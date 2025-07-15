@@ -114,8 +114,8 @@ filterdiff -i '*/fs/squashfs/*' -i '*/include/linux/*' < kernel-patches/linux-2.
 ln -s ../../sqlzma.h fs/squashfs
 ln -s ../../sqmagic.h fs/squashfs
 
-#%patch1 -p1
-#%patch2 -p1
+#%%patch1 -p1
+#%%patch2 -p1
 mv C/Compress/Lzma/kmod/* C/Compress/Lzma
 sed -i 's@../LzmaDecode.c@LzmaDecode.c@' C/Compress/Lzma/module.c
 ln -s ../../../sqlzma.h C/Compress/Lzma
